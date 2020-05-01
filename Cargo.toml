@@ -16,3 +16,4 @@ num-traits = "0.2"
 memoffset = "0.5"
 wgpu = { git = "https://github.com/gfx-rs/wgpu-rs.git", branch="v0.5" }
 winit = "0.22"
+rand = "0.7.3"

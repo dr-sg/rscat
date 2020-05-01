@@ -10,6 +10,13 @@ pub struct Vertex {
     pub color: [f32; 4],
     pub size: f32,
 }
+
+pub struct Line {
+    pub indicies: Vec<u32>,
+    pub verticies: Vec<Vertex>,
+}
+
+
 pub struct Renderer {
     pub surface: wgpu::Surface,
     pub adapter: wgpu::Adapter,
