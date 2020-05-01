@@ -5,6 +5,7 @@ use nalgebra;
 
 mod rendering;
 
+use std::io;
 use std::io::BufRead;
 use winit::{
     event::{Event, WindowEvent},
@@ -18,9 +19,22 @@ enum MouseMode {
     CameraPan,
 }
 
+
 fn main() {
-    let mut vertices = rendering::defaults::get_default_vertices();
-    let mut indecies = rendering::defaults::render_all_vertices(&vertices);
+    
+    let mut lines = Vec::<rendering::Line>::new();
+    lines.push(rendering::defaults::get_random_walk(1.0,0.0,0.0,1000000));
+    lines.push(rendering::defaults::get_random_walk(0.0,1.0,0.0,1000000));
+    lines.push(rendering::defaults::get_random_walk(0.0,0.0,1.0,1000000));
+
+    let mut vertices = rendering::defaults::get_sinc_vertices();
+    let line = rendering::Line{        
+        indicies: rendering::defaults::render_all_vertices(&vertices),
+        verticies: vertices,
+    }; 
+
+    lines.push(line);
+
 
     env_logger::init();
     let event_loop = EventLoop::new();
@@ -52,10 +66,15 @@ fn main() {
                 event: WindowEvent::DroppedFile(path),
                 ..
             } => {
+                lines.clear();
                 let result = file_to_vertices(&path);
                 if result.is_ok() {
-                    vertices = result.unwrap();
-                    indecies = rendering::defaults::render_all_vertices(&vertices);
+                    let vertices = result.unwrap();
+                    let line = rendering::Line{        
+                        indicies: rendering::defaults::render_all_vertices(&vertices),
+                        verticies: vertices,
+                    }; 
+                    lines.push(line)
                 } else {
                     error!("Input contained invalid data: {}", path.as_path().display());
                 }
@@ -142,13 +161,21 @@ fn main() {
                 let mut commands = renderer
                     .device
                     .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
-                    renderer.render(&mut commands, &frame.view, &rendering::defaults::axes(), &rendering::defaults::render_all_vertices(&rendering::defaults::axes()), true);
-                renderer.render(&mut commands, &frame.view, &vertices, &indecies, false);
+                renderer.render(&mut commands, &frame.view, &rendering::defaults::axes(), &rendering::defaults::render_all_vertices(&rendering::defaults::axes()), true);
+                //renderer.render(&mut commands, &frame.view, &vertices, &indecies, false);
+                for i in 0..lines.len() {
+                    let v = &lines[i].verticies;
+                    let i = &lines[i].indicies;
+                    renderer.render(&mut commands, &frame.view, v, &i, false);
+                }
+                
                 renderer.queue.submit(&[commands.finish()]);
             }
             _ => {}
         }
     });
+
+
 }
 
 fn file_to_vertices(
