@@ -1,6 +1,7 @@
 pub mod defaults;
 
 use include_dir::{include_dir, Dir};
+
 const GEN_DIR: Dir = include_dir!("gen");
 // We use `memoffset::offset_of` to get the offsets of all of these fields... do we need C representation?
 #[repr(C, align(16))]
@@ -15,7 +16,6 @@ pub struct Line {
     pub indicies: Vec<u32>,
     pub verticies: Vec<Vertex>,
 }
-
 
 pub struct Renderer {
     pub surface: wgpu::Surface,
@@ -38,10 +38,10 @@ pub struct OrbitCamera {
     fovy: f32,
     znear: f32,
     zfar: f32,
-    target: nalgebra::Point3<f32>,
-    range: f32,
-    azimuth: f32,
-    elevation: f32,
+    pub target: nalgebra::Point3<f32>,
+    pub range: f32,
+    pub azimuth: f32,
+    pub elevation: f32,
 }
 
 #[repr(C, align(16))]
@@ -106,6 +106,22 @@ impl OrbitCamera {
         );
         let world_space_delta = transform * delta * 0.1;
         self.target -= world_space_delta;
+    }
+
+    pub fn set_target(&mut self, target: nalgebra::Point3<f32>) {
+        self.target = target;
+    }
+
+    pub fn set_range(&mut self, range: f32) {
+        self.range = range;
+    }
+
+    pub fn set_azimuth(&mut self, azimuth: f32) {
+        self.azimuth = azimuth;
+    }
+
+    pub fn set_elevation(&mut self, elevation: f32) {
+        self.elevation = elevation;
     }
 }
 
@@ -337,7 +353,7 @@ impl Renderer {
         texture_view: &wgpu::TextureView,
         vertices: &Vec<Vertex>,
         indices: &Vec<u32>,
-        first_pass: bool
+        first_pass: bool,
     ) {
         // It might be expensive to copy these buffers every call?
         let vertex_buffer = self.device.create_buffer_with_data(
@@ -369,16 +385,28 @@ impl Renderer {
                 color_attachments: &[wgpu::RenderPassColorAttachmentDescriptor {
                     attachment: &texture_view,
                     resolve_target: None,
-                    load_op: if first_pass {wgpu::LoadOp::Clear} else {wgpu::LoadOp::Load},
+                    load_op: if first_pass {
+                        wgpu::LoadOp::Clear
+                    } else {
+                        wgpu::LoadOp::Load
+                    },
                     store_op: wgpu::StoreOp::Store,
                     clear_color: wgpu::Color::TRANSPARENT,
                 }],
                 depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachmentDescriptor {
                     attachment: &self.depth_texture_view,
-                    depth_load_op: if first_pass {wgpu::LoadOp::Clear} else {wgpu::LoadOp::Load},
+                    depth_load_op: if first_pass {
+                        wgpu::LoadOp::Clear
+                    } else {
+                        wgpu::LoadOp::Load
+                    },
                     depth_store_op: wgpu::StoreOp::Store,
                     clear_depth: 1.0,
-                    stencil_load_op: if first_pass {wgpu::LoadOp::Clear} else {wgpu::LoadOp::Load},
+                    stencil_load_op: if first_pass {
+                        wgpu::LoadOp::Clear
+                    } else {
+                        wgpu::LoadOp::Load
+                    },
                     stencil_store_op: wgpu::StoreOp::Store,
                     clear_stencil: 0,
                 }),
