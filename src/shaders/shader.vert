@@ -1,10 +1,10 @@
 #version 450
 
-layout (location = 0) in vec4 vPos;
-layout (location = 1) in vec4 vColour;
+layout (location = 0) in vec4 vertex_pos;
+layout (location = 1) in vec4 vertex_colour;
 layout (location = 2) in float size;
 
-layout (location = 0) out vec4 outColour;
+layout (location = 0) out vec4 fragment_colour;
 
 layout(set=0, binding=0)
 uniform CameraUniform {
@@ -14,8 +14,9 @@ uniform CameraUniform {
 
 void main()
 {
-    outColour = vColour;
-    gl_Position = view_proj * vPos;
-    float range = distance(vPos, camera_pos);
-    gl_PointSize = (size/range)*(size/range);
+    fragment_colour = vertex_colour;
+    gl_Position = view_proj * vertex_pos;
+    float range = distance(vertex_pos, camera_pos);
+    float screen_size = (size/range)*(size/range);
+    gl_PointSize = screen_size;
 }
