@@ -5,18 +5,6 @@ use super::Line;
 
 use rand::Rng;
 
-pub fn get_default_dataset() -> Vec::<Line>
-{
-    let mut line = Line{
-        verticies:  Vec::<Vertex>::new(),
-        indicies: Vec::<u32>::new(),
-    };
-
-    let mut lines = Vec::<Line>::new();
-
-    return lines;
-}
-
 pub fn get_random_walk(r: f32,g: f32,b: f32,n: i32) -> Line{
 
 
