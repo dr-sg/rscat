@@ -1,3 +1,4 @@
+#![deny(warnings)]
 #[macro_use]
 extern crate log;
 
@@ -5,7 +6,6 @@ use nalgebra;
 
 mod rendering;
 
-use std::io;
 use std::io::BufRead;
 use winit::{
     event::{Event, WindowEvent},
@@ -27,7 +27,7 @@ fn main() {
     lines.push(rendering::defaults::get_random_walk(0.0,1.0,0.0,1000000));
     lines.push(rendering::defaults::get_random_walk(0.0,0.0,1.0,1000000));
 
-    let mut vertices = rendering::defaults::get_sinc_vertices();
+    let vertices = rendering::defaults::get_sinc_vertices();
     let line = rendering::Line{        
         indicies: rendering::defaults::render_all_vertices(&vertices),
         verticies: vertices,
