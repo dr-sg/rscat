@@ -1315,6 +1315,7 @@ dependencies = [
  "memoffset",
  "nalgebra",
  "num-traits",
+ "rand",
  "wgpu",
  "winit",
 ]
